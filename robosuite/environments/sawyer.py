@@ -270,6 +270,11 @@ class SawyerEnv(MujocoEnv):
                 self.sim.data.get_body_xquat("right_hand"), to="xyzw"
             )
 
+            # Normalization of quaternions and reverse sign if negs for w, see if this is right?
+            di["eef_quat"] = di["eef_quat"]/np.linalg.norm(di["eef_quat"])
+            if(di["eef_quat"][3] < 0 ):
+                di["eef_quat"] = - di["eef_quat"]
+
             # add in gripper information
             robot_states.extend([di["gripper_qpos"], di["eef_pos"], di["eef_quat"]])
 

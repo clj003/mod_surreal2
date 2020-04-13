@@ -8,6 +8,7 @@ import numpy as np
 from gym import spaces
 from robosuite.wrappers import Wrapper
 
+import robosuite.utils.transform_utils as T
 
 class GymWrapper(Wrapper):
     env = None
@@ -46,13 +47,25 @@ class GymWrapper(Wrapper):
         high = np.inf * np.ones(self.obs_dim)
         low = -high
         self.observation_space = spaces.Box(low=low, high=high)
+        
+        print("# of joint positions and # of joint vel and # of gripper joint pos eef pos and eef quat: \n ", self.env._ref_joint_pos_indexes , self.env._ref_joint_vel_indexes, self.env._ref_gripper_joint_pos_indexes, self.env.sim.data.site_xpos[self.env.eef_site_id], T.convert_quat(
+            self.env.sim.data.get_body_xquat("right_hand"), to="xyzw"
+            ) )
+
+        print("object state: cube_pos, cube_quat, gripper to cube dist :  \n", 
+                np.array(self.env.sim.data.body_xpos[self.env.cube_body_id]) , 
+                T.convert_quat(
+                    np.array(self.sim.data.body_xquat[self.cube_body_id]), to="xyzw"
+                    ),
+                np.array(self.sim.data.site_xpos[self.eef_site_id]) - np.array(self.sim.data.body_xpos[self.cube_body_id])
+                )
 
         #print("gym wrapper obs space size: ",self.observation_space.shape) # for debugging, ends up as 40
 
         low, high = self.env.action_spec
         self.action_space = spaces.Box(low=low, high=high)
 
-        print("gym wrapper high and low values of env: ",high , low)
+        #print("gym wrapper high and low values of env: ",high , low)
 
         # Set up a reward range, seed, spec and metadata for compatibility with baseline
         self.reward_range = (-float('inf'), float('inf'))

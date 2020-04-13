@@ -56,13 +56,17 @@ def playback_trajectory(env, ep_dir):
     for state_file in sorted(glob(state_paths)):
         print(state_file)
         dic = np.load(state_file)
+
+        for key in dic:
+            print(key)
         
         # FOr MOdels
-        #states = dic["sims"] # sims observation instead states
+        states = dic["sims"][0] # sims observation instead states
         #actions = dic["acs"]
 
         # For Combined
         #states = dic["sims"][0] # sims observation instead states
+        test_states = dic["obs"]
         actions = dic["acs"]
 
         #print("shape of actions: ", actions.shape)
@@ -72,25 +76,37 @@ def playback_trajectory(env, ep_dir):
 
         # For combined
         env.reset()
+        env.sim.set_state_from_flattened(dic["sims"][0][0])
         env.sim.forward()
 
         #print("environment action space: ", env.action_spec) # check out action space
         #print("an actions shape: ", actions[0].shape) # notics take the tensor out
         #print("environment degree of freedom: ", env.dof)
 
-        for action in actions[3]:
+        inc = 0
+        #for action in actions[0]:
             #print("action length: ", len(action))
-            env.step(action)
-            env.render()
+            #print("action: ", abs(action) <= np.ones(len(action)) )
+            #ob, _ , _ , _ = env.step(action)
+            #print("test if the state collected is the same one generated: ")
+            #print("ob: ", ob)
+            #print("test_states: ", test_states[0][inc])
+            #print(ob == test_states[0][inc])
+            #env.render()
+            #inc += 1
 
         # Play from action instead of states for testing
-        #for state in states:
-        #    env.sim.set_state_from_flattened(state)
-        #    env.sim.forward()
-        #    env.render()
-        #    t += 1
-        #    if t % 100 == 0:
-        #        print(t)
+        for state in states:
+            env.sim.set_state_from_flattened(state)
+            env.sim.forward()
+            inc += 1
+        #    print("ob: ", env._flatten_obs(env._get_observation() ) )
+            print("test_states comp if norms: ", np.product(test_states[0][inc] <= np.ones(len(test_states[0][inc]))) )
+        #    print(env._flatten_obs( env._get_observation() ) == test_states[0][inc])
+            env.render()
+            t += 1
+            if t % 100 == 0:
+                print(t)
 
 
 
@@ -103,7 +119,7 @@ if __name__ == "__main__":
     #parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/ac100/models/")
 
     # For checking combined
-    parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/ac100/combined/")
+    parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/cube_quat_norm/combined/")
 
     parser.add_argument("--timesteps", type=int, default=2000)
     args = parser.parse_args()

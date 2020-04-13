@@ -78,6 +78,7 @@ def merge_multiple_trajectories_npz(directory):
 
         state_paths = os.path.join(directory, ep_directory, "model_*.npz")
         episode_states = []
+        episode_sims = []
         episode_actions = []
         episode_ep_rets = []
         episode_rews = []
@@ -110,11 +111,16 @@ def merge_multiple_trajectories_npz(directory):
                 prev_episode = episode_states[ep_ind]
                 duped_episode = episode_states[ep_ind] 
                 
+                prev_episode_sims = episode_sims[ep_ind]
+                duped_episode_sims = episode_sims[ep_ind] 
+                
                 for dup_ind in range(0, (max_ep_len - prev_episode.shape[0]) ):
                     duped_episode = np.insert(duped_episode, duped_episode.shape[0] , duped_episode[ duped_episode.shape[0] - 1 ] , axis=0  ) # insert at the end? make sure that -1 inserts at the end for obj, replicate last state
+                    duped_episode_sims = np.insert(duped_episode_sims, duped_episode_sims.shape[0] , duped_episode_sims[ duped_episode_sims.shape[0] - 1 ] , axis=0  ) # insert at the end? make sure that -1 inserts at the end for obj, replicate last state
 
                 # Update the episode in the 3-tensor
                 episode_states[ep_ind] = duped_episode
+                episode_sims[ep_ind] = duped_episode_sims
 
             # THis part is for actions
             for ep_ac_ind in range(0, len(episode_actions) ):
@@ -134,6 +140,11 @@ def merge_multiple_trajectories_npz(directory):
             pre_len = current_obs.shape[0]
             to_copy_state = current_obs[-1]
 
+            # Current sims
+            current_sims = dic["sims"][0]
+            pre_len_sims = current_sims.shape[0]
+            to_copy_sims = current_sims[-1]
+            
             # Current actions
             current_actions = dic["acs"][0]
             #pre_acs_len = current_obs.shape[0]
@@ -143,10 +154,12 @@ def merge_multiple_trajectories_npz(directory):
 
             for cur_ep_ind in range(0, max_ep_len - pre_len):
                 current_obs = np.insert(current_obs, current_obs.shape[0], to_copy_state, axis=0)
+                current_sims = np.insert(current_sims, current_sims.shape[0], to_copy_sims, axis=0)
                 current_actions = np.insert(current_actions, current_actions.shape[0], to_copy_action, axis=0)
 
             # Insert the newly modified episode into the modified 3-t
             episode_states.append(current_obs)
+            episode_sims.append(current_sims)
             episode_actions.append(current_actions)
 
 
@@ -168,8 +181,10 @@ def merge_multiple_trajectories_npz(directory):
             #print("shape of the episode actions", len(episode_actions) , episode_actions[0].shape )
             
             episode_states = np.reshape(episode_states, ( len(episode_states), max_ep_len,-1 ) )
+            episode_sims = np.reshape(episode_sims, ( len(episode_sims), max_ep_len,-1 ) )
             episode_actions = np.reshape(episode_actions, ( len(episode_actions), max_ep_ac_len,-1 ) )
             #print("shape of the episode states", episode_states.shape)
+            #print("shape of the episode sims", episode_sims.shape)
             #print("shape of the episode actions", episode_actions.shape)
 
             #print("This is episode states after:  \n", episode_states )
@@ -192,6 +207,7 @@ def merge_multiple_trajectories_npz(directory):
         np.savez(
             ep_path,
             obs = episode_states,
+            sims = episode_sims,
             acs = episode_actions,
             ep_rets = np.zeros(len(episode_states)),
             rews = np.zeros(( len(episode_states), max_ep_len )),
@@ -204,7 +220,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         type=str,
-        default=os.path.join(robosuite.models.assets_root, "demonstrations/1trajstry/"),
+        default=os.path.join(robosuite.models.assets_root, "demonstrations/120_for_reach/"),
     ) # change from just demonstrations
     parser.add_argument("--environment", type=str, default="SawyerLift")
     args = parser.parse_args()

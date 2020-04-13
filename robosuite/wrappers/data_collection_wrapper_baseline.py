@@ -183,7 +183,7 @@ class DataCollectionWrapperBaseline(Wrapper):
                 )
             
             
-            self.action_infos.append( np.concatenate([info["joint_velocities"], info["gripper_actuation"]]) ) # changed so the actual action is stored rather than a dic
+            self.action_infos.append( np.clip( np.concatenate([info["joint_velocities"], info["gripper_actuation"]]), -1, 1 )  ) # changed so the actual action is stored rather than a dic, clip the actions since actuation is also clipped, since envspec low high is -1,1
             #self.action_infos.append(info)
 
         # flush collected data to disk if necessary

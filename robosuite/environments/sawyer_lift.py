@@ -299,6 +299,11 @@ class SawyerLift(SawyerEnv):
             di["cube_pos"] = cube_pos
             di["cube_quat"] = cube_quat
 
+            # For normalization purposes, similar to sawyer norm for robot
+            di["cube_quat"] = di["cube_quat"]/np.linalg.norm(di["cube_quat"])
+            if(di["cube_quat"][3] < 0):
+                di["cube_quat"] = - di["cube_quat"]
+
             gripper_site_pos = np.array(self.sim.data.site_xpos[self.eef_site_id])
             di["gripper_to_cube"] = gripper_site_pos - cube_pos
 

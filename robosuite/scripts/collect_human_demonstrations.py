@@ -64,6 +64,8 @@ def collect_human_trajectory(env, device):
 
         obs, reward, done, info = env.step(action)
 
+
+
         if is_first:
             is_first = False
 

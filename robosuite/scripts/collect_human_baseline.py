@@ -64,6 +64,9 @@ def collect_human_trajectory(env, device):
 
         obs, reward, done, info = env.step(action)
 
+
+        # Test if the collected state space is what we want
+
         if is_first:
             is_first = False
 
@@ -215,7 +218,7 @@ def gather_demonstrations_as_npz(directory, out_dir):
         np.savez(
             ep_path,
             obs = np.reshape( np.array(states), (1, np.array(states).shape[0], np.array(states).shape[1] ) ) , # reshape for the sake of loading data
-            sims = np.array(sims), # for simulation
+            sims = np.reshape( np.array(sims), (1, np.array(sims).shape[0], np.array(sims).shape[1] ) ), # for simulation
             acs = np.reshape( np.array(actions), (1, np.array(actions).shape[0], np.array(actions).shape[1]) )  , # change to have the same sort of input as obs
             ep_rets = ep_rets,
             rews = rews

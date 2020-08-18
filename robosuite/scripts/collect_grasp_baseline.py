@@ -402,6 +402,8 @@ if __name__ == "__main__":
         has_renderer=True,
         control_freq=100,
         gripper_visualization=True,
+        box_pos = [0.63522776, -0.3287869, 0.82162434], # shift2
+        box_quat=[0.6775825618903728, 0, 0, 0.679425538604203], # shift2
     )
 
     pre_env = robosuite.make(
@@ -411,6 +413,8 @@ if __name__ == "__main__":
             has_renderer=True,
             control_freq=100,
             gripper_visualization=True,
+            box_pos = [0.63522776, -0.3287869, 0.82162434], # shift2
+            box_quat=[0.6775825618903728, 0, 0, 0.679425538604203], # shift2
         )
 
 
@@ -464,7 +468,7 @@ if __name__ == "__main__":
     with tf.compat.v1.Session() as sess:            
         sess.run(init_op)
         # Load Checkpoint
-        ckpt = tf.compat.v1.train.get_checkpoint_state('../../../grasp_strange/trpo_gail.transition_limitation_2100.SawyerLift.g_step_1.d_step_1.policy_entcoeff_0.adversary_entcoeff_0.001.seed_0/')
+        ckpt = tf.compat.v1.train.get_checkpoint_state('../../../reach_shift2/trpo_gail.transition_limitation_2500.SawyerLift.g_step_1.d_step_1.policy_entcoeff_0.adversary_entcoeff_0.001.seed_0/')
         saver.restore(sess, ckpt.model_checkpoint_path)
 
         

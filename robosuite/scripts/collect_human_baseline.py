@@ -35,7 +35,7 @@ def collect_human_trajectory(env, device):
     obs = env.reset()
 
     # rotate the gripper so we can see it easily
-    env.set_robot_joint_positions([0, -1.18, 0.00, 2.18, 0.00, 0.57, 1.5708])
+    #env.set_robot_joint_positions([0, -1.18, 0.00, 2.18, 0.00, 0.57, 1.5708])
 
     env.viewer.set_camera(camera_id=2)
     env.render()
@@ -86,8 +86,8 @@ def collect_human_trajectory(env, device):
 
         env.render()
 
-        if task_completion_hold_count == 0:
-            break
+        #if task_completion_hold_count == 0:
+        #    break
 
         # state machine to check for having a success for 10 consecutive timesteps
         if env._check_success():
@@ -287,6 +287,21 @@ if __name__ == "__main__":
         has_renderer=True,
         control_freq=100,
         gripper_visualization=True,
+        #rob_init= [0.2, 0.18, 0.30, -9.48, 12.20, -5.57, 80.5708],
+        #box_pos = [0.63522776, -0.3287869, 0.82162434], #shift2 
+        #box_quat=[0.6775825618903728, 0, 0, 0.679425538604203], #shift2
+        #box_pos = [0.23522776, 0.2287869, 0.82162434], #shift3 
+        #box_quat=[0.3775825618903728, 0, 0, 0.679425538604203], #shift3
+        #box_pos = [0.53522776, 0.3287869, 0.82162434], #shift4 
+        #box_quat=[0.5775825618903728, 0, 0, 0.679425538604203], #shift4
+        #box_pos = [0.53522776, 0.1287869, 0.82162434], #shift5 
+        #box_quat=[0.4775825618903728, 0, 0, 0.679425538604203], #shift5
+        #box_pos = [0.48522776, -0.187869, 0.82162434], #shift6 
+        #box_quat=[0.8775825618903728, 0, 0, 0.679425538604203], #shift6
+        #box_pos = [0.43522776, -0.367869, 0.82162434], #shift7 
+        #box_quat=[0.2775825618903728, 0, 0, 0.679425538604203], #shift7
+        #box_pos = [0.53522776, -0.0287869, 1.22162434] # this is to find positions to lift to
+        box_pos = [0.3, 0.1, 1.4] # this is to find positions to lift to
     )
 
     # enable controlling the end effector directly instead of using joint velocities

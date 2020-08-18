@@ -12,7 +12,7 @@ class TableTopTask(Task):
     arena, and the objetcts into a single MJCF model.
     """
 
-    def __init__(self, mujoco_arena, mujoco_robot, mujoco_objects, initializer=None):
+    def __init__(self, mujoco_arena, mujoco_robot, mujoco_objects, initializer=None, box_pos_array=[np.array([ 0.53522776, -0.0287869 ,  0.82162434])], box_quat_array=[[0.8775825618903728, 0, 0, 0.479425538604203]]):
         """
         Args:
             mujoco_arena: MJCF model of robot workspace
@@ -21,6 +21,11 @@ class TableTopTask(Task):
             initializer: placement sampler to initialize object positions.
         """
         super().__init__()
+
+        # added for custom initialization of box
+        self.box_pos_array = box_pos_array
+        self.box_quat_array= box_quat_array
+        # --------------------------
 
         self.merge_arena(mujoco_arena)
         self.merge_robot(mujoco_robot)
@@ -75,8 +80,12 @@ class TableTopTask(Task):
     
     def place_objects_not_random(self):
         """Places objects randomly until no collisions or max iterations hit."""
-        pos_arr = [np.array([ 0.53522776, -0.0287869 ,  0.82162434])]
-        quat_arr = [[0.8775825618903728, 0, 0, 0.479425538604203]]
+        #pos_arr = [np.array([ 0.53522776, -0.0287869 ,  0.82162434])]
+        #quat_arr = [[0.8775825618903728, 0, 0, 0.479425538604203]]
+
+        pos_arr = self.box_pos_array
+        quat_arr = self.box_quat_array
+
         for i in range(len(self.objects)):
             self.objects[i].set("pos", array_to_string(pos_arr[i]))
             self.objects[i].set("quat", array_to_string(quat_arr[i]))

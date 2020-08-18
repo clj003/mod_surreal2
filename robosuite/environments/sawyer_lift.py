@@ -37,6 +37,11 @@ class SawyerLift(SawyerEnv):
         camera_height=256,
         camera_width=256,
         camera_depth=False,
+        rob_init=[0, -1.18, 0.00, 2.18, 0.00, 0.57, 1.5708],
+        box_pos=[0.53522776, -0.0287869, 0.82162434],
+        box_quat=[0.8775825618903728, 0, 0, 0.479425538604203],
+        box_end = [0.53522776, -0.0287869, 1.22162434], # for the ending position of box for dense reward
+        generalize_goal = False, # indicator to add the goal of the box position
     ):
         """
         Args:
@@ -106,7 +111,17 @@ class SawyerLift(SawyerEnv):
         # reward configuration
         self.reward_shaping = reward_shaping
 
+        # robot and box initial
+        self.rob_init = np.array(rob_init)
+        self.box_pos = [np.array(box_pos)]
+        self.box_quat = [box_quat]
+        self.box_end = np.array(box_end)
+
         #self.seed = None
+
+        # For generalization of place goal
+        self.generalize_goal = generalize_goal
+
 
         # object placement initializer
         if placement_initializer:
@@ -168,6 +183,8 @@ class SawyerLift(SawyerEnv):
             self.mujoco_robot,
             self.mujoco_objects,
             initializer=self.placement_initializer,
+            box_pos_array = self.box_pos,
+            box_quat_array = self.box_quat,
         )
         #self.model.place_objects()
 
@@ -205,7 +222,7 @@ class SawyerLift(SawyerEnv):
         #init_pos += np.random.randn(init_pos.shape[0]) * 0.02
 
         # Modified so that it matches collected trajectories initialization
-        init_pos = np.array([0, -1.18, 0.00, 2.18, 0.00, 0.57, 1.5708])
+        init_pos = self.rob_init
 
 
         self.sim.data.qpos[self._ref_joint_pos_indexes] = np.array(init_pos)
@@ -231,11 +248,15 @@ class SawyerLift(SawyerEnv):
         reward = 0.
 
         # sparse completion reward
-        if self._check_success():
-            reward = 1.0
+        #if self._check_success():
+        #    reward = 1.0
+
+        #if self._check_moved_from_orig():
+        #    reward = 0.2
 
         # use a shaping reward
         if self.reward_shaping:
+
 
             # reaching reward
             cube_pos = self.sim.data.body_xpos[self.cube_body_id]
@@ -244,6 +265,8 @@ class SawyerLift(SawyerEnv):
             reaching_reward = 1 - np.tanh(10.0 * dist)
             reward += reaching_reward
 
+            
+            
             # grasping reward
             touch_left_finger = False
             touch_right_finger = False
@@ -260,6 +283,11 @@ class SawyerLift(SawyerEnv):
             if touch_left_finger and touch_right_finger:
                 reward += 0.25
 
+            # For the distance between end objective
+            #reward += 2/( 1 + 300*np.linalg.norm( self.box_end - cube_pos) )
+            get_lifted_reward = 2*( 1 - np.tanh(10.0 * np.linalg.norm( self.box_end - cube_pos) ) )
+            reward += get_lifted_reward
+        
         return reward
 
     def _get_observation(self):
@@ -311,6 +339,8 @@ class SawyerLift(SawyerEnv):
                 [cube_pos, cube_quat, di["gripper_to_cube"]]
             )
 
+            di["lift_reach_reward"] = self.box_end # reward for reaching ie. lifting
+
         return di
 
     def _check_contact(self):
@@ -338,6 +368,25 @@ class SawyerLift(SawyerEnv):
 
         # cube is higher than the table top above a margin
         return cube_height > table_height + 0.04
+
+    def _check_moved_from_orig(self):
+        """
+        Returns True if has moved away from original start position.
+        """
+        cube_pos = self.sim.data.body_xpos[self.cube_body_id]
+
+        dir_vec = (self.box_end - self.box_pos)/np.linalg.norm(self.box_end - self.box_pos) # direction vector, normalized
+
+        vec_to_project = cube_pos - self.box_pos
+
+        inner_prod = np.inner(dir_vec, vec_to_project)
+
+        #cube_height = self.sim.data.body_xpos[self.cube_body_id][2]
+        #table_height = self.table_full_size[2]
+
+        # cube is higher than the table top above a margin
+        return inner_prod  > 0.1
+
 
     def _gripper_visualization(self):
         """

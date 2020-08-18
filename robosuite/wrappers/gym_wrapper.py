@@ -13,7 +13,7 @@ import robosuite.utils.transform_utils as T
 class GymWrapper(Wrapper):
     env = None
 
-    def __init__(self, env, keys=None):
+    def __init__(self, env, keys=None, generalized_goal=False):
         """
         Initializes the Gym wrapper.
 
@@ -36,6 +36,8 @@ class GymWrapper(Wrapper):
         if keys is None:
             assert self.env.use_object_obs, "Object observations need to be enabled."
             keys = ["robot-state", "object-state"]
+            if generalized_goal:
+                keys.append("lift_reach_reward")
         self.keys = keys
 
         # set up observation and action spaces
@@ -48,17 +50,17 @@ class GymWrapper(Wrapper):
         low = -high
         self.observation_space = spaces.Box(low=low, high=high)
         
-        print("# of joint positions and # of joint vel and # of gripper joint pos eef pos and eef quat: \n ", self.env._ref_joint_pos_indexes , self.env._ref_joint_vel_indexes, self.env._ref_gripper_joint_pos_indexes, self.env.sim.data.site_xpos[self.env.eef_site_id], T.convert_quat(
-            self.env.sim.data.get_body_xquat("right_hand"), to="xyzw"
-            ) )
+        #print("# of joint positions and # of joint vel and # of gripper joint pos eef pos and eef quat: \n ", self.env._ref_joint_pos_indexes , self.env._ref_joint_vel_indexes, self.env._ref_gripper_joint_pos_indexes, self.env.sim.data.site_xpos[self.env.eef_site_id], T.convert_quat(
+         #   self.env.sim.data.get_body_xquat("right_hand"), to="xyzw"
+         #   ) )
 
-        print("object state: cube_pos, cube_quat, gripper to cube dist :  \n", 
-                np.array(self.env.sim.data.body_xpos[self.env.cube_body_id]) , 
-                T.convert_quat(
-                    np.array(self.sim.data.body_xquat[self.cube_body_id]), to="xyzw"
-                    ),
-                np.array(self.sim.data.site_xpos[self.eef_site_id]) - np.array(self.sim.data.body_xpos[self.cube_body_id])
-                )
+        #print("object state: cube_pos, cube_quat, gripper to cube dist :  \n", 
+        #        np.array(self.env.sim.data.body_xpos[self.env.cube_body_id]) , 
+        #        T.convert_quat(
+        #            np.array(self.sim.data.body_xquat[self.cube_body_id]), to="xyzw"
+         #           ),
+         #       np.array(self.sim.data.site_xpos[self.eef_site_id]) - np.array(self.sim.data.body_xpos[self.cube_body_id])
+         #       )
 
         #print("gym wrapper obs space size: ",self.observation_space.shape) # for debugging, ends up as 40
 

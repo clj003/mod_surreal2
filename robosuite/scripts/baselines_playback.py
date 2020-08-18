@@ -119,7 +119,7 @@ if __name__ == "__main__":
     #parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/ac100/models/")
 
     # For checking combined
-    parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/1_traj_grasp_test/combined/")
+    parser.add_argument("--directory", type=str, default="/home/mastercljohnson/Robotics/GAIL_Part/mod_surreal/robosuite/models/assets/demonstrations/120_shift7/combined/")
 
     parser.add_argument("--timesteps", type=int, default=2000)
     args = parser.parse_args()

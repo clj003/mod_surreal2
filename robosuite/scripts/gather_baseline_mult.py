@@ -220,7 +220,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         type=str,
-        default=os.path.join(robosuite.models.assets_root, "demonstrations/1_traj_grasp_test/"),
+        default=os.path.join(robosuite.models.assets_root, "demonstrations/120_shift5/"),
     ) # change from just demonstrations
     parser.add_argument("--environment", type=str, default="SawyerLift")
     args = parser.parse_args()

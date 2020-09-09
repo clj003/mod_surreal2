@@ -248,8 +248,8 @@ class SawyerLift(SawyerEnv):
         reward = 0.
 
         # sparse completion reward
-        #if self._check_success():
-        #    reward = 1.0
+        if self._check_success():
+            reward = 1.0
 
         #if self._check_moved_from_orig():
         #    reward = 0.2
@@ -285,7 +285,7 @@ class SawyerLift(SawyerEnv):
 
             # For the distance between end objective
             #reward += 2/( 1 + 300*np.linalg.norm( self.box_end - cube_pos) )
-            get_lifted_reward = 2*( 1 - np.tanh(10.0 * np.linalg.norm( self.box_end - cube_pos) ) )
+            get_lifted_reward = 50*( 1 - np.tanh(10.0 * np.linalg.norm( self.box_end - cube_pos) ) )
             reward += get_lifted_reward
         
         return reward

@@ -63,6 +63,7 @@ def collect_human_trajectory(env, device):
         action = np.concatenate([dpos, dquat, [grasp]])
 
         obs, reward, done, info = env.step(action)
+        print(reward)
 
 
         # Test if the collected state space is what we want
@@ -282,6 +283,7 @@ if __name__ == "__main__":
     # create original environment
     env = robosuite.make(
         args.environment,
+        reward_shaping=True,
         ignore_done=True,
         use_camera_obs=False,
         has_renderer=True,

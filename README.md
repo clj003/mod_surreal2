@@ -1,3 +1,6 @@
+# Disclaimer: This repository is based off of the surreal robotics suite as indicated below. To use, follow similar instructions below for install from source
+
+
 # Surreal Robotics Suite
 
 ![gallery of_environments](resources/gallery.png)
